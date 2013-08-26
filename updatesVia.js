@@ -32,11 +32,16 @@ $rdf.UpdatesSocket = (function() {
     this.connected = false;
     this.pending = {};
     this.subscribed = {};
-    this.socket = new WebSocket(via);
-    this.socket.onopen = this.onOpen;
-    this.socket.onclose = this.onClose;
-    this.socket.onmessage = this.onMessage;
-    this.socket.onerror = this.onError;
+    this.socket = {};
+    try {
+      this.socket = new WebSocket(via);
+      this.socket.onopen = this.onOpen;
+      this.socket.onclose = this.onClose;
+      this.socket.onmessage = this.onMessage;
+      this.socket.onerror = this.onError;
+    } catch (error) {
+      this.onError(error);
+    }
   }
 
   UpdatesSocket.prototype._decode = function(q) {
@@ -64,9 +69,9 @@ $rdf.UpdatesSocket = (function() {
   };
 
   UpdatesSocket.prototype._send = function(method, uri, data) {
-    var message;
+    var message, _base;
     message = [method, uri, data].join(' ');
-    return this.socket.send(message);
+    return typeof (_base = this.socket).send === "function" ? _base.send(message) : void 0;
   };
 
   UpdatesSocket.prototype._subscribe = function(uri) {
@@ -95,10 +100,10 @@ $rdf.UpdatesSocket = (function() {
   };
 
   UpdatesSocket.prototype.onMessage = function(e) {
-    var message;
+    var message, _base;
     message = e.data.split(' ');
     if (message[0] === 'ping') {
-      return this.socket.send('pong ' + message.slice(1).join(' '));
+      return typeof (_base = this.socket).send === "function" ? _base.send('pong ' + message.slice(1).join(' ')) : void 0;
     } else if (message[0] === 'pub') {
       return this.parent.onUpdate(message[1], this._decode(message[2]));
     }

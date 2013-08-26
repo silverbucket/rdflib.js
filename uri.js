@@ -20,7 +20,7 @@ if ((_ref = $rdf.Util) == null) {
   $rdf.Util = {};
 }
 
-$rdf.Util.uri = (function() {
+$rdf.uri = (function() {
 
   function uri() {}
 
@@ -91,16 +91,16 @@ $rdf.Util.uri = (function() {
     return base.slice(0, baseSingle) + path;
   };
 
-  if (typeof tabulator !== "undefined" && tabulator !== null ? tabulator.isExtension : void 0) {
-    uri.join2 = function(given, base) {
-      var baseURI, tIOService;
+  uri.join2 = function(given, base) {
+    var baseURI, tIOService;
+    if (typeof tabulator !== "undefined" && tabulator !== null ? tabulator.isExtension : void 0) {
       tIOService = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
       baseURI = tIOService.newURI(base, null, null);
       return tIOService.newURI(baseURI.resolve(given), null, null).spec;
-    };
-  } else {
-    uri.join2 = uri.join;
-  }
+    } else {
+      return this.join(given, base);
+    }
+  };
 
   uri.commonHost = new RegExp('^[-_a-zA-Z0-9.]+:(//[^/]*)?/[^/]*$');
 
@@ -204,6 +204,8 @@ $rdf.Util.uri = (function() {
 
 }).call(this);
 
+$rdf.Util.uri = $rdf.uri;
+
 if ((typeof module !== "undefined" && module !== null ? module.exports : void 0) != null) {
   if ((_ref1 = (_base = module.exports).Util) == null) {
     _base.Util = {};
@@ -214,4 +216,5 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
     v = _ref2[k];
     module.exports.Util[k] = v;
   }
+  module.exports.uri = $rdf.uri;
 }
